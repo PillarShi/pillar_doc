@@ -5,6 +5,7 @@ def main(config_name, config_out_name):
     os.system("menuconfig")
     config = open(config_name, "r")
     config_cmake = open(config_out_name+".cmake","w")
+    config_cmake.write("include_directories(.)")
     config_h = open(config_out_name+".h", "w")
     config_h_define = f"_{config_out_name.upper()}_H_"
     config_h.write(f"#ifndef {config_h_define}\n#define {config_h_define}\n\n")
