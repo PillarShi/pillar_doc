@@ -22,4 +22,4 @@ bash $ACME_PATH/acme.sh --install-cert -d $DNAME \
 --key-file       $KEY_FILE \
 --fullchain-file $CERT_FILE
 
-reboot
+/sbin/reboot
