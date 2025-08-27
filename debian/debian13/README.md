@@ -86,3 +86,32 @@ apt install -y vim p7zip-full curl
 apt install -y git python-is-python3
 apt install -y build-essential ninja-build # gnu + ninja
 ```
+
+# 其他
+
+## 静态IPV4
+
+```bash
+ip route show default # 输出结果中 via 后面的那个IP地址就是你的网关地址
+sudo cp /etc/network/interfaces /etc/network/interfaces.backup # 备份
+sudo vim /etc/network/interfaces
+```
+
+```interfaces
+# 可能原先的
+allow-hotplug enp0s3
+iface enp0s3 inet dhcp
+# 修改为
+allow-hotplug enp0s3
+iface enp0s3 inet static
+    address 192.168.1.100
+    netmask 255.255.255.0
+    gateway 192.168.1.1
+    broadcast 192.168.1.255
+```
+
+```bash
+sudo systemctl restart networking # 重启网络
+ping baidu.com
+```
+
