@@ -115,3 +115,16 @@ sudo systemctl restart networking # 重启网络
 ping baidu.com
 ```
 
+## dwm
+
+[官网地址](https://dwm.suckless.org/)
+
+```bash
+sudo apt install libx11-dev libxft-dev libxinerama-dev # 安装依赖
+sudo apt install xinit # x服务器
+tar -xzvf dwmxxx.tar.gz
+cd dwmxxx
+make clean install # 编译安装
+vim ~/.xinitrc
+```
+
