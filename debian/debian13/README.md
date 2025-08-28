@@ -44,7 +44,7 @@ nano /etc/apt/sources.list
 deb https://mirrors.tuna.tsinghua.edu.cn/debian/ trixie main contrib
 deb https://mirrors.tuna.tsinghua.edu.cn/debian/ trixie-updates main contrib
 deb https://mirrors.tuna.tsinghua.edu.cn/debian/ trixie-backports main contrib
-deb https://security.debian.org/debian-security trixie-security main contrib
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security trixie-security main contrib
 ```
 
 阿里
@@ -53,7 +53,7 @@ deb https://security.debian.org/debian-security trixie-security main contrib
 deb https://mirrors.aliyun.com/debian/ trixie main contrib
 deb https://mirrors.aliyun.com/debian/ trixie-updates main contrib
 deb https://mirrors.aliyun.com/debian/ trixie-backports main contrib
-deb https://security.debian.org/debian-security trixie-security main contrib
+deb https://mirrors.aliyun.com/debian-security trixie-security main contrib
 ```
 
 按`Ctrl + X`离开，再按`Y`保存
