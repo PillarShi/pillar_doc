@@ -35,16 +35,25 @@ su
 nano /etc/apt/sources.list
 ```
 
-将文件中的内容删除，将如下全部内容粘贴到文件中，以下为Debian12的阿里源，Debian其他版本和其他Linux发行版请自行上网上查询源的内容
+将文件中的内容删除，将如下全部内容粘贴到文件中，以下为Debian13的清华源，Debian其他版本和其他Linux发行版请自行上网上查询源的内容
 
-阿里云
+清华
 
 ```bash
 #单纯下载可以只有第一行
-deb https://mirrors.aliyun.com/debian/ trixie main
-deb https://mirrors.aliyun.com/debian-security/ trixie-security main
-deb https://mirrors.aliyun.com/debian/ trixie-updates main
-deb https://mirrors.aliyun.com/debian/ trixie-backports main
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ trixie main contrib
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ trixie-updates main contrib
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ trixie-backports main contrib
+deb https://security.debian.org/debian-security trixie-security main contrib
+```
+
+阿里
+
+```bash
+deb https://mirrors.aliyun.com/debian/ trixie main contrib
+deb https://mirrors.aliyun.com/debian/ trixie-updates main contrib
+deb https://mirrors.aliyun.com/debian/ trixie-backports main contrib
+deb https://security.debian.org/debian-security trixie-security main contrib
 ```
 
 按`Ctrl + X`离开，再按`Y`保存
@@ -126,5 +135,22 @@ tar -xzvf dwmxxx.tar.gz
 cd dwmxxx
 make clean install # 编译安装
 vim ~/.xinitrc
+# 添加
+exec dwm
+# 保存文件运行
+startx
 ```
 
+# ipv6 关闭
+
+```bash
+sudo vim /etc/sysctl.conf
+
+# 写入
+net.ipv6.conf.all.disable_ipv6=1 #禁用所有网络接口ipv6
+net.ipv6.conf.default.disable_ipv6=1 # 禁用新创建的网络接口ipv6
+net.ipv6.conf.lo.disable_ipv6=1 # 禁用回环接口ipv6
+
+# 执行以下命令让配置立即生效
+sudo sysctl -p
+```
