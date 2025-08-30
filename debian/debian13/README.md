@@ -141,7 +141,7 @@ exec dwm
 startx
 ```
 
-# ipv6 关闭
+## ipv6 关闭
 
 ```bash
 sudo vim /etc/sysctl.conf
@@ -153,4 +153,25 @@ net.ipv6.conf.lo.disable_ipv6=1 # 禁用回环接口ipv6
 
 # 执行以下命令让配置立即生效
 sudo sysctl -p
+```
+
+## claude-code
+
+```bash
+sudo apt install nodejs npm
+sudo npm install -g @anthropic-ai/claude-code
+# sudo npm install -g @anthropic-ai/claude-code --registry=https://registry.npmmirror.com # 淘宝镜像源
+claude
+```
+
+## qemu
+
+```bash
+sudo apt install qemu-system qemu-utils
+```
+
+## uboot编译
+
+```bash
+sudo apt install bison flex
 ```
