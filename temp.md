@@ -3,8 +3,18 @@ vscode setting
 
 ```setting
 {
-    ...
-
+    "workbench.colorTheme": "Default Dark+",
+    "workbench.iconTheme": "material-icon-theme",
+    "files.autoSave": "afterDelay",
+    "editor.fontSize": 17,
+    "editor.bracketPairColorization.enabled": false,
+    "editor.rulers": [
+        80
+    ],
+    "terminal.integrated.fontSize": 15,
+    "terminal.integrated.cursorBlinking": true,
+    // "accessibility.signalOptions.volume": 0,
+    // "hediet.vscode-drawio.resizeImages": null,
     "C_Cpp.intelliSenseEngine": "disabled", // 禁用 IntelliSense 引擎
     "C_Cpp.autocomplete": "disabled", // 禁用自动补全功能
     "C_Cpp.errorSquiggles": "disabled", // 禁用错误波浪线提示
