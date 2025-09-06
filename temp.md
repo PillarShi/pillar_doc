@@ -13,8 +13,8 @@ vscode setting
     ],
     "terminal.integrated.fontSize": 15,
     "terminal.integrated.cursorBlinking": true,
-    // "accessibility.signalOptions.volume": 0,
-    // "hediet.vscode-drawio.resizeImages": null,
+    "accessibility.signalOptions.volume": 0,
+    "hediet.vscode-drawio.resizeImages": null,
     "C_Cpp.intelliSenseEngine": "disabled", // 禁用 IntelliSense 引擎
     "C_Cpp.autocomplete": "disabled", // 禁用自动补全功能
     "C_Cpp.errorSquiggles": "disabled", // 禁用错误波浪线提示
@@ -42,7 +42,7 @@ vscode setting
         "--rename-file-limit=0",
         // 启用项目特定的配置文件（如.clangd）
         "--enable-config",
-        // 使用24个线程并行处理，加速索引和编译操作
+        // 使用8个线程并行处理，加速索引和编译操作
         "-j=8",
         // 将预编译头文件存储在内存中，提高性能但增加内存使用
         "--pch-storage=memory",
@@ -50,8 +50,8 @@ vscode setting
         "--pretty",
         // // 指定查询驱动程序工具的路径（用于获取系统头文件路径等）
         // "--query-driver=${userHome}/arm-none-eabi-gcc/14.2.1/bin/arm-none-eabi-g*"
-        // 指定编译命令数据库的目录路径（用于获取项目的编译设置）
-        "--compile-commands-dir=${workspaceFolder}/.vscode",
+        // 指定编译命令数据库的目录路径（用于获取项目的编译设置） 可以在.vscode/setting.json中
+        // "--compile-commands-dir=${workspaceFolder}/.vscode",
     ]
 }
 ```
