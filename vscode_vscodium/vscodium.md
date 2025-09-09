@@ -1,7 +1,7 @@
 
-vscode setting
+# vscode settings.json
 
-```setting
+```json
 {
     "workbench.colorTheme": "Default Dark+",
     "workbench.iconTheme": "material-icon-theme",
@@ -49,9 +49,36 @@ vscode setting
         // 输出美观格式的诊断信息
         "--pretty",
         // // 指定查询驱动程序工具的路径（用于获取系统头文件路径等）
-        // "--query-driver=${userHome}/arm-none-eabi-gcc/14.2.1/bin/arm-none-eabi-g*"
-        // 指定编译命令数据库的目录路径（用于获取项目的编译设置） 可以在.vscode/setting.json中
-        // "--compile-commands-dir=${workspaceFolder}/.vscode",
+        // "--query-driver=${userHome}/arm-none-eabi-gcc/14.2.1/bin/arm-none-eabi-g*",
+        // 指定编译命令数据库的目录路径（用于获取项目的编译设置）
+        "--compile-commands-dir=${workspaceFolder}/build",
     ]
 }
 ```
+
+# Open Remote - SSH
+
+1. 先尝试连接
+
+    在配置文件中添加
+    
+    ```
+    Host host_name
+        HostName host_url
+        User user_name
+        Port ssh_port
+    ```
+
+    连接，如果成功就直接使用了。若失败，执行下面步骤。
+
+2. 下载远端codium服务端
+
+    以linux为远端，下载远端codium服务端压缩包。
+
+    ![](./pic/download_Remot_Host.png)
+
+3. 解压服务端
+
+    上传文件到`~/.vscodium-server/bin/版本号/`（版本号会在第一次连接时创建文件夹），解压压缩包。
+    再次连接即可成功。
+    若失败删除版本号文件夹，重启并重新创建版本号文件夹，再将服务端压缩包上传并解压，再次连接即可成功。
