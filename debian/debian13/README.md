@@ -94,6 +94,7 @@ apt intstall -y net-tools ssh
 apt install -y vim p7zip-full curl
 apt install -y git python-is-python3
 apt install -y build-essential ninja-build # gnu + ninja
+sudo apt install fonts-noto-cjk // 中文字体包
 ```
 
 # 其他
@@ -123,6 +124,10 @@ iface enp0s3 inet static
 sudo systemctl restart networking # 重启网络
 ping baidu.com
 ```
+
+## VPN
+
+linux可以使用[v2raya](https://github.com/v2rayA/v2rayA)
 
 ## dwm
 
