@@ -174,9 +174,3 @@ claude
 ```bash
 sudo apt install qemu-system qemu-utils
 ```
-
-## uboot编译
-
-```bash
-sudo apt install bison flex
-```
