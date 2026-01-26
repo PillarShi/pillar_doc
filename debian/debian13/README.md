@@ -1,5 +1,9 @@
 # debian13
 
+## 安装注意
+
+安装时可以勾选`SSH server`，方便ssh链接和直接使用sftp。`standard system utilities`也可以勾上。
+
 ## 1 修复环境变量
 
 发现没有debian安装后没有自动添加环境变量，需要手动
@@ -90,10 +94,11 @@ cd /sbin/
 可以apt也可以nala
 
 ```bash
-apt intstall -y net-tools ssh
+apt intstall -y net-tools
 apt install -y vim p7zip-full curl
 apt install -y git python-is-python3
 apt install -y build-essential ninja-build # gnu + ninja
+apt install bash-completion // bash补全脚本
 sudo apt install fonts-noto-cjk // 中文字体包
 ```
 
@@ -127,7 +132,17 @@ ping baidu.com
 
 ## VPN
 
-linux可以使用[v2raya](https://github.com/v2rayA/v2rayA)
+linux可以使用[v2raya](https://github.com/v2rayA/v2rayA)+[xray](https://github.com/XTLS/Xray-core)
+
+> 把xray的可执行程序放到`/user/bin`
+> 
+> 下载 [geoip.dat](https://github.com/v2fly/geoip/releases/latest/download/geoip.dat)，复制到`/root/.local/share/xray/geoip.dat`
+>
+> 下载 [dlc.dat](https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat)，复制并重命名到`/root/.local/share/xray/geosite.dat`
+>
+> `sudo systemctl start v2raya.service` 启动
+>
+> `sudo systemctl enable v2raya.service`自启
 
 ## dwm
 
