@@ -104,7 +104,9 @@ sudo apt install fonts-noto-cjk // 中文字体包
 
 # 其他
 
-## 静态IPV4
+## 桥接下可以设置
+
+### 静态IPV4
 
 ```bash
 ip route show default # 输出结果中 via 后面的那个IP地址就是你的网关地址
@@ -128,6 +130,20 @@ iface enp0s3 inet static
 ```bash
 sudo systemctl restart networking # 重启网络
 ping baidu.com
+```
+
+### ipv6 关闭
+
+```bash
+sudo vim /etc/sysctl.conf
+
+# 写入
+net.ipv6.conf.all.disable_ipv6=1 #禁用所有网络接口ipv6
+net.ipv6.conf.default.disable_ipv6=1 # 禁用新创建的网络接口ipv6
+net.ipv6.conf.lo.disable_ipv6=1 # 禁用回环接口ipv6
+
+# 执行以下命令让配置立即生效
+sudo sysctl -p
 ```
 
 ## VPN
@@ -159,20 +175,6 @@ vim ~/.xinitrc
 exec dwm
 # 保存文件运行
 startx
-```
-
-## ipv6 关闭
-
-```bash
-sudo vim /etc/sysctl.conf
-
-# 写入
-net.ipv6.conf.all.disable_ipv6=1 #禁用所有网络接口ipv6
-net.ipv6.conf.default.disable_ipv6=1 # 禁用新创建的网络接口ipv6
-net.ipv6.conf.lo.disable_ipv6=1 # 禁用回环接口ipv6
-
-# 执行以下命令让配置立即生效
-sudo sysctl -p
 ```
 
 ## claude-code

@@ -5,6 +5,7 @@
 
 ```bash
 sudo apt install bc
+sudo apt install libssl-dev
 ```
 
 ## 编译
