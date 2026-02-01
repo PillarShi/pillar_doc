@@ -156,6 +156,8 @@ linux可以使用[v2raya](https://github.com/v2rayA/v2rayA)+[xray](https://githu
 >
 > 下载 [dlc.dat](https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat)，复制并重命名到`/root/.local/share/xray/geosite.dat`
 >
+> 上面两个文件xray中也有类似，可以使用
+> 
 > `sudo systemctl start v2raya.service` 启动
 >
 > `sudo systemctl enable v2raya.service`自启
