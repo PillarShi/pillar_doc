@@ -35,6 +35,8 @@
         // // 指定查询驱动程序工具的路径（用于获取系统头文件路径等）
         "--query-driver=/opt/arm-gnu-toolchain-14.2.rel1-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-*",
     ],
+    "editor.tabSize": 8,
+    "editor.insertSpaces": false,
 }
 ```
 
