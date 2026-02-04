@@ -1,0 +1,76 @@
+From 90deb3cc574ccc6bc06fd6a48a9bd73555291423 Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Tue, 3 Feb 2026 15:08:53 +0800
+Subject: [PATCH] =?UTF-8?q?=E5=8D=95=E7=8B=AC=E7=BC=96=E8=AF=91=E6=9F=90?=
+ =?UTF-8?q?=E4=B8=AAmodule=EF=BC=88=E9=A6=96=E5=85=88=E8=A6=81=E7=BC=96?=
+ =?UTF-8?q?=E8=AF=91=E4=B8=80=E6=AC=A1=E5=86=85=E6=A0=B8=EF=BC=8C=E7=94=9F?=
+ =?UTF-8?q?=E6=88=90=E5=BF=85=E8=A6=81=E7=9A=84=E6=96=87=E4=BB=B6=EF=BC=89?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ ko_test/Makefile | 12 ++++++++++++
+ ko_test/first.c  | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
+ create mode 100644 ko_test/Makefile
+ create mode 100644 ko_test/first.c
+
+diff --git a/ko_test/Makefile b/ko_test/Makefile
+new file mode 100644
+index 000000000..6a735615c
+--- /dev/null
++++ b/ko_test/Makefile
+@@ -0,0 +1,12 @@
++CROSS_PREFIX:=~/project/PDC/riscv64-wangzai-linux-gnu-gcc/bin/riscv64-unknown-linux-gnu-
++CROSS_ARCH:=riscv
++KERNEL_DIR:=~/project/PDC/linux-5.4
++CUR_DIR := $(shell pwd)
++
++obj-m = first.o
++
++.PHONY: all clean
++all:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) -C $(KERNEL_DIR) M=$(CUR_DIR) modules
++clean:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) -C $(KERNEL_DIR) M=$(CUR_DIR) clean
+diff --git a/ko_test/first.c b/ko_test/first.c
+new file mode 100644
+index 000000000..0ece955fe
+--- /dev/null
++++ b/ko_test/first.c
+@@ -0,0 +1,31 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/**
++ * My first code for linux kernel init.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++
++#include <linux/kernel.h>
++#include <linux/types.h>
++#include <linux/module.h>
++
++static int __init first_init(void)
++{
++	pr_info("===> %s : %s init\n", __FILE__, __func__);
++	return 0;
++}
++
++static void __exit first_exit(void)
++{
++	pr_info("===> %s : %s exit\n", __FILE__, __func__);
++}
++
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my first code");
++
++module_init(first_init);
++module_exit(first_exit);
+-- 
+2.47.3
+

@@ -1,0 +1,77 @@
+From 1e997f40822f9f6c2781497dda0f7202f5dd5342 Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Tue, 3 Feb 2026 13:52:36 +0800
+Subject: [PATCH] 01-first code
+
+---
+ drivers/misc/Kconfig  |  6 ++++++
+ drivers/misc/Makefile |  1 +
+ drivers/misc/first.c  | 30 ++++++++++++++++++++++++++++++
+ 3 files changed, 37 insertions(+)
+ create mode 100644 drivers/misc/first.c
+
+diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
+index 0e1de42db..9a2a3be6d 100644
+--- a/drivers/misc/Kconfig
++++ b/drivers/misc/Kconfig
+@@ -493,6 +493,12 @@ config POWER_KEY
+         help
+                 This driver for key powerff.
+ 
++config FIRST_CODE
++	tristate "My first kernel code"
++	default n
++	help
++		My first kernel code
++
+ source "drivers/misc/c2port/Kconfig"
+ source "drivers/misc/eeprom/Kconfig"
+ source "drivers/misc/cb710/Kconfig"
+diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
+index 27319e612..23a084e4b 100644
+--- a/drivers/misc/Makefile
++++ b/drivers/misc/Makefile
+@@ -64,3 +64,4 @@ obj-$(CONFIG_SUNXI_ADDR_MGT)    += sunxi-addr/
+ obj-$(CONFIG_SUNXI_BOOTEVENT)   += sunxi-bootevent/
+ obj-y                           += sunxi-gorilla/
+ obj-$(CONFIG_POWER_KEY)		+= powerkey.o
++obj-$(CONFIG_FIRST_CODE)	+= first.o
+diff --git a/drivers/misc/first.c b/drivers/misc/first.c
+new file mode 100644
+index 000000000..7200c2b3a
+--- /dev/null
++++ b/drivers/misc/first.c
+@@ -0,0 +1,30 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/**
++ * My first code for linux kernel init.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++
++#include <linux/kernel.h>
++#include <linux/types.h>
++#include <linux/module.h>
++
++static int __init first_init(void)
++{
++	pr_info("%s : %s init\n", __FILE__, __func__);
++	return 0;
++}
++
++static void __exit first_exit(void)
++{
++	pr_info("%s : %s exit\n", __FILE__, __func__);
++}
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my first code");
++
++module_init(first_init);
++module_exit(first_exit);
+-- 
+2.47.3
+
