@@ -1,0 +1,124 @@
+From c26f9fd2024fa21073a9db2639598f812477f438 Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Fri, 6 Feb 2026 11:46:44 +0800
+Subject: [PATCH] 03-IDR
+
+---
+ idr_test/Makefile   | 12 +++++++
+ idr_test/idr_test.c | 85 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 97 insertions(+)
+ create mode 100644 idr_test/Makefile
+ create mode 100644 idr_test/idr_test.c
+
+diff --git a/idr_test/Makefile b/idr_test/Makefile
+new file mode 100644
+index 000000000..8826e1374
+--- /dev/null
++++ b/idr_test/Makefile
+@@ -0,0 +1,12 @@
++CROSS_ARCH := riscv
++CROSS_PREFIX := ~/project/PDC/riscv64-wangzai-linux-gnu-gcc/bin/riscv64-unknown-linux-gnu-
++KERNEL_DIR := ~/project/PDC/linux-5.4
++CUR_DIR := $(shell pwd)
++
++obj-m := idr_test.o
++
++.PHONY: all clean
++all:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) modules
++clean:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) clean
+diff --git a/idr_test/idr_test.c b/idr_test/idr_test.c
+new file mode 100644
+index 000000000..bf3804c28
+--- /dev/null
++++ b/idr_test/idr_test.c
+@@ -0,0 +1,85 @@
++// SPDX-License-Identifier: GPL-2.0
++/**
++ * My code for linux idr.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++
++#include <linux/kernel.h>
++#include <linux/types.h>
++#include <linux/module.h>
++#include <linux/idr.h>
++
++static struct idr idr;
++
++static int __init idr_test_init(void)
++{
++	int id1, id2, id3, id4, idt;
++	char *str, *str_temp;
++
++	/* init idr */
++	idr_init(&idr);
++
++	/* add elements */
++	idr_lock_irq(&idr);
++	id1 = idr_alloc(&idr, "id1", 0, 3, GFP_KERNEL);
++	id2 = idr_alloc(&idr, "id2", 0, 3, GFP_KERNEL);
++	id3 = idr_alloc(&idr, "id3", 0, 3, GFP_KERNEL);
++	id4 = idr_alloc(&idr, "id4", 0, 3, GFP_KERNEL);
++	idr_unlock_irq(&idr);
++	if (id4 < 0)
++		pr_info("id4 allocation failed\n");
++
++	/* is empty */
++	if (idr_is_empty(&idr))
++		pr_info("idr is empty");
++	else
++		pr_info("idr is not empty");
++	pr_info("\n");
++
++	/* find elements by id */
++	str = idr_find(&idr, id1);
++	pr_info("id1 ==> id[%d] : %s\n", id1, str);
++	str = idr_find(&idr, id2);
++	pr_info("id2 ==> id[%d] : %s\n", id2, str);
++	str = idr_find(&idr, id3);
++	pr_info("id3 ==> id[%d] : %s\n", id3, str);
++	pr_info("\n");
++
++	/* delete elements */
++	idr_lock_irq(&idr);
++	str = idr_remove(&idr, id2);
++	idr_unlock_irq(&idr);
++	pr_info("delete id2 ==> id[%d] : %s\n", id2, str);
++	pr_info("\n");
++
++	/* replace elements */
++	idr_lock_irq(&idr);
++	str = idr_replace(&idr, "idx", id1);
++	idr_unlock_irq(&idr);
++	str_temp = idr_find(&idr, id1);
++	pr_info("replace id1 ==> id[%d] : from %s to %s\n", id1, str, str_temp);
++	pr_info("\n");
++
++	/* traverse elements */
++	idr_for_each_entry(&idr, str, idt)
++		pr_info("id[%d] : %s\n", idt, str);
++
++	return 0;
++}
++
++static void __exit idr_test_exit(void)
++{
++	/* free idr */
++	idr_destroy(&idr);
++	pr_info("destory idr\n");
++}
++
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my idr code");
++
++module_init(idr_test_init);
++module_exit(idr_test_exit);
+-- 
+2.47.3
+

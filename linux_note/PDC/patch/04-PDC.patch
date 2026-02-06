@@ -1,0 +1,153 @@
+From 69825d1fd80208bef3d5c96c7d6cbbd3f2c16945 Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Fri, 6 Feb 2026 16:17:23 +0800
+Subject: [PATCH] 04-list
+
+---
+ list_test/Makefile    |  12 +++++
+ list_test/list_test.c | 114 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 126 insertions(+)
+ create mode 100644 list_test/Makefile
+ create mode 100644 list_test/list_test.c
+
+diff --git a/list_test/Makefile b/list_test/Makefile
+new file mode 100644
+index 000000000..3ccb6f68a
+--- /dev/null
++++ b/list_test/Makefile
+@@ -0,0 +1,12 @@
++CROSS_ARCH := riscv
++CROSS_PREFIX := ~/project/PDC/riscv64-wangzai-linux-gnu-gcc/bin/riscv64-unknown-linux-gnu-
++KERNEL_DIR := ~/project/PDC/linux-5.4
++CUR_DIR := $(shell pwd)
++
++obj-m := list_test.o
++
++.PHONY: all clean
++all:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) modules
++clean:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) clean
+diff --git a/list_test/list_test.c b/list_test/list_test.c
+new file mode 100644
+index 000000000..847af2d30
+--- /dev/null
++++ b/list_test/list_test.c
+@@ -0,0 +1,114 @@
++// SPDX-License-Identifier: GPL-2.0
++/**
++ * My code for linux list.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++#include <linux/types.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/list.h>
++#include <linux/slab.h>
++
++#define ELEME_NAME_LEN	16
++
++struct element {
++	struct list_head list;
++	char name[ELEME_NAME_LEN];
++};
++
++static struct list_head elem_list;
++
++static struct element *element_alloc(char *name)
++{
++	struct element *temp;
++
++	temp = kmalloc(sizeof(struct element), GFP_KERNEL);
++
++	if (temp == NULL) {
++		return NULL;
++	}
++	strcpy(temp->name, name);
++	return temp;
++}
++
++static void element_free(struct element *elem)
++{
++	kfree(elem);
++}
++
++static int __init list_test_init(void)
++{
++	struct element *e1, *e2, *e3, *ex;
++	struct element *temp;
++	int ret = 0;
++	/* 初始化 list */
++	INIT_LIST_HEAD(&elem_list);
++
++	/* 申请添加element */
++	e1 = element_alloc("element 1");
++	if (e1 == NULL) {
++		ret = -ENOMEM;
++		goto exit;
++	}
++	list_add_tail(&e1->list, &elem_list);
++
++	e2 = element_alloc("element 2");
++	if (e2 == NULL) {
++		ret = -ENOMEM;
++		goto free_e1;
++	}
++	list_add_tail(&e2->list, &elem_list);
++
++	e3 = element_alloc("element 3");
++	if (e3 == NULL) {
++		ret = -ENOMEM;
++		goto free_e2;
++	}
++	list_add_tail(&e3->list, &elem_list);
++
++	/* 遍历并删除 2 */
++	list_for_each_entry_safe(ex, temp, &elem_list, list) {
++		pr_info("element %s\n", ex->name);
++		if (strcmp(ex->name, "element 2") == 0) {
++			list_del(&ex->list);
++			element_free(ex);
++		}
++	}
++
++	/* 再次遍历 */
++	list_for_each_entry_safe(ex, temp, &elem_list, list) {
++		pr_info("element %s\n", ex->name);
++		list_del(&ex->list);
++		element_free(ex);
++	}
++
++	if (list_empty(&elem_list)) {
++		pr_info("list is empty!\n");
++	} else {
++		pr_err("list is not empty!\n");
++		ret = -1;
++	}
++	goto exit;
++
++free_e2:
++	element_free(e2);
++free_e1:
++	element_free(e1);
++exit:
++	return ret;
++}
++
++static void __exit list_test_exit(void)
++{
++	pr_info("list test exit\n");
++}
++
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my list code");
++
++module_init(list_test_init);
++module_exit(list_test_exit);
+-- 
+2.47.3
+
