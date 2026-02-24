@@ -1,0 +1,117 @@
+From 128875d07591688b70e1ba00c35614ea110ef286 Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Tue, 24 Feb 2026 19:48:16 +0800
+Subject: [PATCH] 06-bitmap
+
+---
+ bitmap_test/Makefile      | 13 +++++++
+ bitmap_test/bitmap_test.c | 77 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 90 insertions(+)
+ create mode 100644 bitmap_test/Makefile
+ create mode 100644 bitmap_test/bitmap_test.c
+
+diff --git a/bitmap_test/Makefile b/bitmap_test/Makefile
+new file mode 100644
+index 000000000..6dc1a37e0
+--- /dev/null
++++ b/bitmap_test/Makefile
+@@ -0,0 +1,13 @@
++CROSS_ARCH := riscv
++CROSS_PREFIX := ~/project/PDC/riscv64-wangzai-linux-gnu-gcc/bin/riscv64-unknown-linux-gnu-
++CUR_DIR := $(shell pwd)
++KERNEL_DIR := ~/project/PDC/linux-5.4
++
++obj-m := bitmap_test.o
++
++.PHONY: all clean
++
++all:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) -C $(KERNEL_DIR) M=$(CUR_DIR) modules
++clean:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) -C $(KERNEL_DIR) M=$(CUR_DIR) clean
+diff --git a/bitmap_test/bitmap_test.c b/bitmap_test/bitmap_test.c
+new file mode 100644
+index 000000000..4080ae809
+--- /dev/null
++++ b/bitmap_test/bitmap_test.c
+@@ -0,0 +1,77 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/**
++ * My code for linux bitmap.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/module.h>
++#include <linux/bitmap.h>
++
++#define BITMAP_SIZE	128
++
++DECLARE_BITMAP(bitmap1, BITMAP_SIZE);
++DECLARE_BITMAP(bitmap2, BITMAP_SIZE);
++
++static int __init bitmap_test_init(void)
++{
++	int i;
++
++	for (i = 0; i < 10; i++)
++		bitmap_set(bitmap1, i, 1);
++	if (bitmap_full(bitmap1, 10))
++		pr_info("bitmap1 first 10 bits are all 1\n");
++	else
++		pr_info("bitmap1 first 10 bits are not all 1\n");
++
++	/* bitmap1 set all 0 */
++	bitmap_zero(bitmap1, BITMAP_SIZE);
++	/* bitmap2 set all 1 */
++	bitmap_fill(bitmap2, BITMAP_SIZE);
++	/* bitmap1 = bitmap1 & bitmap2 */
++	bitmap_and(bitmap1, bitmap1, bitmap2, BITMAP_SIZE);
++	if (bitmap_full(bitmap1, BITMAP_SIZE))
++		pr_info("bitmap full\n");
++	else
++		pr_info("bitmap empty\n");
++
++	/* bitmap1 set all 0 */
++	bitmap_zero(bitmap1, BITMAP_SIZE);
++	/* bitmap2 set all 1 */
++	bitmap_fill(bitmap2, BITMAP_SIZE);
++	/* bitmap1 = bitmap1 | bitmap2 */
++	bitmap_or(bitmap1, bitmap1, bitmap2, BITMAP_SIZE);
++	if (bitmap_empty(bitmap1, BITMAP_SIZE))
++		pr_info("bitmap empty\n");
++	else
++		pr_info("bitmap full\n");
++
++	/* bitmap1 set all 0 */
++	bitmap_zero(bitmap1, BITMAP_SIZE);
++	bitmap_set(bitmap1, 0, 10);
++	/*
++	 * 从 start(0) 的 bit 处查找对齐 align_mask(0) 的连续 br(10) 个为 0 的区域标签
++	 */
++	i = bitmap_find_next_zero_area(bitmap1, BITMAP_SIZE,
++					0, 10, 0);
++	pr_info("idx = %d\n", i);
++
++	return 0;
++}
++
++static void __exit bitmap_test_exit(void)
++{
++	pr_info("exit test bitmap\n");
++}
++
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my bitmap code");
++
++module_init(bitmap_test_init);
++module_exit(bitmap_test_exit);
+-- 
+2.47.3
+

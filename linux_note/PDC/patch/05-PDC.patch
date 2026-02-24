@@ -1,0 +1,170 @@
+From 564afff785d1bf8a85595ead1752b3cadc5e3a7c Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Tue, 10 Feb 2026 14:55:48 +0800
+Subject: [PATCH] 05-rbtree
+
+---
+ rbtree_test/Makefile      |  13 ++++
+ rbtree_test/rbtree_test.c | 131 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 144 insertions(+)
+ create mode 100644 rbtree_test/Makefile
+ create mode 100644 rbtree_test/rbtree_test.c
+
+diff --git a/rbtree_test/Makefile b/rbtree_test/Makefile
+new file mode 100644
+index 000000000..ad3aa0fd2
+--- /dev/null
++++ b/rbtree_test/Makefile
+@@ -0,0 +1,13 @@
++CROSS_ARCH := riscv
++CROSS_PREFIX := ~/project/PDC/riscv64-wangzai-linux-gnu-gcc/bin/riscv64-unknown-linux-gnu-
++CUR_DIR := $(shell pwd)
++KERNEL_DIR := ~/project/PDC/linux-5.4
++
++obj-m := rbtree_test.o
++
++.PHONY: all clean
++
++all:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) -C $(KERNEL_DIR) M=$(CUR_DIR) modules
++clean:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) -C $(KERNEL_DIR) M=$(CUR_DIR) clean
+diff --git a/rbtree_test/rbtree_test.c b/rbtree_test/rbtree_test.c
+new file mode 100644
+index 000000000..f2827c638
+--- /dev/null
++++ b/rbtree_test/rbtree_test.c
+@@ -0,0 +1,131 @@
++// SPDX-License-Identifier: GPL-2.0
++/**
++ * My code for linux rbtree.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++#include <linux/module.h>
++#include <linux/types.h>
++#include <linux/kernel.h>
++#include <linux/rbtree.h>
++#include <linux/slab.h>
++
++struct person {
++	int		age;
++	char		name[20];
++	struct rb_node	node;
++};
++
++static void pt_insert(struct rb_root *root, struct person *per)
++{
++	struct rb_node **cur_node = &(root->rb_node);
++	/* parent must be initialized to NULL for the top-level node's parent */
++	struct rb_node *cur_node_parent = NULL;
++	struct person *cur_per = NULL;
++
++	while (*cur_node) {
++		cur_node_parent = *cur_node;
++		cur_per = rb_entry(cur_node_parent, struct person, node);
++		if (cur_per->age < per->age) {
++			cur_node = &(cur_node_parent->rb_right);
++		} else if (cur_per->age > per->age) {
++			cur_node = &(cur_node_parent->rb_left);
++		} else {
++			pr_info("insert already age\n");
++			return;
++		}
++	}
++	rb_link_node(&per->node, cur_node_parent, cur_node);
++	rb_insert_color(&per->node, root);
++}
++
++static struct person *pt_find_by_age(struct rb_root *root, int age)
++{
++	struct rb_node *cur_node = root->rb_node;
++	struct person *cur_per = NULL;
++
++	while (cur_node) {
++		cur_per = rb_entry(cur_node, struct person, node);
++		if (cur_per->age > age)
++			cur_node = cur_node->rb_left;
++		else if (cur_per->age < age)
++			cur_node = cur_node->rb_right;
++		else
++			return cur_per;
++	}
++
++	return NULL;
++}
++
++static void pt_delete_all(struct rb_root *root)
++{
++	struct rb_node *cur, *next;
++	struct person *per = NULL;
++
++	for (cur = rb_first(root), next = rb_next(cur);
++	     cur != NULL;
++	     /* rb_next does not contain a judgment for NULL */
++	     cur = next, next = next ? rb_next(next) : NULL) {
++		per = rb_entry(cur, struct person, node);
++		pr_info("delete %s, age is %d\n", per->name, per->age);
++		rb_erase(cur, root);
++	}
++}
++
++static int __init rbtree_test_init(void)
++{
++	struct rb_root *pt = NULL;
++	struct person p1 = {
++		.age = 10,
++		.name = "child"
++	};
++	struct person p2 = {
++		.age = 20,
++		.name = "teenager"
++	};
++	struct person p3 = {
++		.age = 40,
++		.name = "parent"
++	};
++
++	pt = kmalloc(sizeof(struct rb_root), GFP_KERNEL);
++	*pt = RB_ROOT;
++
++	if (RB_EMPTY_ROOT(pt))
++		pr_info("rbtree empty\n");
++	else
++		pr_info("rbtree is not empty!\n");
++
++	pt_insert(pt, &p1);
++	pt_insert(pt, &p2);
++	pt_insert(pt, &p3);
++
++	pr_info("age %d is %s\n", 10, pt_find_by_age(pt, 10)->name);
++	pr_info("age %d is %s\n", 20, pt_find_by_age(pt, 20)->name);
++	pr_info("age %d is %s\n", 40, pt_find_by_age(pt, 40)->name);
++
++	pt_delete_all(pt);
++
++	if (RB_EMPTY_ROOT(pt))
++		pr_info("delete all, rbtree empty\n");
++	else
++		pr_info("delete failed, rbtree is not empty!\n");
++
++	kfree(pt);
++	return 0;
++}
++
++static void __exit rbtree_test_exit(void)
++{
++	pr_info("rbtree test exit\n");
++}
++
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my rbtree code");
++
++module_init(rbtree_test_init);
++module_exit(rbtree_test_exit);
+-- 
+2.47.3
+
