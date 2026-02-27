@@ -1,0 +1,153 @@
+From eeea8ad5b806898997de3db4612dbd3c614b78e5 Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Fri, 27 Feb 2026 15:07:49 +0800
+Subject: [PATCH] 07-kfifo
+
+---
+ kfifo_test/Makefile     |  13 +++++
+ kfifo_test/kfifo_test.c | 111 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 124 insertions(+)
+ create mode 100644 kfifo_test/Makefile
+ create mode 100644 kfifo_test/kfifo_test.c
+
+diff --git a/kfifo_test/Makefile b/kfifo_test/Makefile
+new file mode 100644
+index 000000000..b84b8902c
+--- /dev/null
++++ b/kfifo_test/Makefile
+@@ -0,0 +1,13 @@
++CROSS_ARCH := riscv
++CROSS_PREFIX := ~/project/PDC/riscv64-wangzai-linux-gnu-gcc/bin/riscv64-unknown-linux-gnu-
++CUR_DIR := $(shell pwd)
++KERNEL_DIR := ~/project/PDC/linux-5.4
++
++obj-m := kfifo_test.o
++
++.PHONY: all clean
++
++all:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) -C $(KERNEL_DIR) M=$(CUR_DIR) modules
++clean:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) -C $(KERNEL_DIR) M=$(CUR_DIR) clean
+diff --git a/kfifo_test/kfifo_test.c b/kfifo_test/kfifo_test.c
+new file mode 100644
+index 000000000..8f6ce0c82
+--- /dev/null
++++ b/kfifo_test/kfifo_test.c
+@@ -0,0 +1,111 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/**
++ * My code for linux kfifo.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/module.h>
++#include <linux/kfifo.h>
++
++#define KFIFO_SIZE 4
++#define KFIFO_STATIC_WAY 1
++
++#if KFIFO_STATIC_WAY
++struct age_fifo {
++	DECLARE_KFIFO(fifo, int, KFIFO_SIZE);
++};
++static struct age_fifo age_fifo;
++#define fifo2 (age_fifo.fifo)
++#else
++static DEFINE_KFIFO(age_fifo, int, KFIFO_SIZE);
++#define fifo2 age_fifo
++#endif
++
++static int __init kfifo_test_init(void)
++{
++	int ret;
++	struct kfifo fifo1; /* __STRUCT_KFIFO_PTR(unsigned char, 0, void) */
++	char buffer1[4], val1[4];
++	int buffer2[4], val2[4];
++
++	pr_info("The kfifo copies data rather than pointers.\n");
++
++	pr_info("\ndynamic kfifo fifo1 :\n");
++	ret = kfifo_alloc(&fifo1, KFIFO_SIZE, GFP_KERNEL);
++	if (ret) {
++		pr_info("kfifo alloc failed.\n");
++		return ret;
++	}
++
++	buffer1[0] = 'P';
++	buffer1[1] = 'S';
++	kfifo_put(&fifo1, buffer1[0]);
++	kfifo_put(&fifo1, buffer1[1]);
++	buffer1[0] = '1';
++	buffer1[1] = '2';
++	buffer1[2] = '3';
++	ret = kfifo_in(&fifo1, buffer1, 3);
++	pr_info("currtent fifo1 length = %d\n", kfifo_len(&fifo1));
++
++	pr_info("max fifo1 size = %d\n", kfifo_size(&fifo1));
++
++	ret = kfifo_out(&fifo1, val1, kfifo_len(&fifo1));
++	pr_info("val1[0~3] : %c %c %c %c\n", val1[0], val1[1], val1[2], val1[3]);
++
++	ret = kfifo_out(&fifo1, val1, kfifo_size(&fifo1));
++	if (ret == 0 && kfifo_is_empty(&fifo1))
++		pr_info("fifo1 is empty\n");
++	else
++		pr_info("fifo1 is not empty, vurrtent length is %d\n",
++			kfifo_len(&fifo1));
++
++	Kfifo_free(&fifo1);
++
++	pr_info("\nstatic kfifo fifo2 :\n");
++
++#if KFIFO_STATIC_WAY
++	buffer2[0] = 44;
++	buffer2[1] = 33;
++	INIT_KFIFO(fifo2); /* DECLARE_KFIFO need init, but DEFINE_KFIFO not */
++#else
++	buffer2[0] = 99;
++	buffer2[1] = 88;
++#endif
++	kfifo_put(&fifo2, buffer2[0]);
++	kfifo_put(&fifo2, buffer2[1]);
++	buffer2[0] = 77;
++	buffer2[1] = 66;
++	buffer2[2] = 55;
++	ret = kfifo_in(&fifo2, buffer2, 3);
++	pr_info("currtent fifo2 length = %d\n", kfifo_len(&fifo2));
++
++	pr_info("max fifo2 size = %d\n", kfifo_size(&fifo2));
++
++	ret = kfifo_out(&fifo2, val2, kfifo_len(&fifo2));
++	pr_info("val1[0~3] : %d %d %d %d\n", val2[0], val2[1], val2[2], val2[3]);
++
++	ret = kfifo_out(&fifo2, val2, kfifo_size(&fifo2));
++	if (ret == 0 && kfifo_is_empty(&fifo2))
++		pr_info("fifo2 is empty\n");
++	else
++		pr_info("fifo2 is not empty, vurrtent length is %d\n",
++			kfifo_len(&fifo2));
++
++	return 0;
++}
++
++static void __exit kfifo_test_exit(void)
++{
++	pr_info("kfifo test exit\n");
++}
++
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my kfifo code");
++
++module_init(kfifo_test_init);
++module_exit(kfifo_test_exit);
+-- 
+2.47.3
+

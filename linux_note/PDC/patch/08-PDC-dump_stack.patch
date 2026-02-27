@@ -1,0 +1,86 @@
+From 2bae92765a7a5e407e16ff6f9512396e053fb710 Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Fri, 27 Feb 2026 10:16:13 +0800
+Subject: [PATCH] 08-dump_stack
+
+---
+ dump_stack_test/Makefile          | 13 +++++++++
+ dump_stack_test/dump_stack_test.c | 46 +++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+)
+ create mode 100644 dump_stack_test/Makefile
+ create mode 100644 dump_stack_test/dump_stack_test.c
+
+diff --git a/dump_stack_test/Makefile b/dump_stack_test/Makefile
+new file mode 100644
+index 000000000..ce949522e
+--- /dev/null
++++ b/dump_stack_test/Makefile
+@@ -0,0 +1,13 @@
++CROSS_ARCH := riscv
++CROSS_PREFIX := ~/project/PDC/riscv64-wangzai-linux-gnu-gcc/bin/riscv64-unknown-linux-gnu-
++CUR_DIR := $(shell pwd)
++KERNEL_DIR := ~/project/PDC/linux-5.4
++
++obj-m := dump_stack_test.o
++
++.PHONY: all clean
++
++all:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) -C $(KERNEL_DIR) M=$(CUR_DIR) modules
++clean:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) -C $(KERNEL_DIR) M=$(CUR_DIR) clean
+diff --git a/dump_stack_test/dump_stack_test.c b/dump_stack_test/dump_stack_test.c
+new file mode 100644
+index 000000000..bdb304307
+--- /dev/null
++++ b/dump_stack_test/dump_stack_test.c
+@@ -0,0 +1,46 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/**
++ * My code for linux dump_stack.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/module.h>
++
++static noinline void func3(void)
++{
++	dump_stack();
++}
++
++static noinline void func2(void)
++{
++	func3();
++}
++
++static noinline void func1(void)
++{
++	func2();
++}
++
++static int __init dump_stack_test_init(void)
++{
++	func1();
++	return 0;
++}
++
++static void __exit dump_stack_test_exit(void)
++{
++	pr_info("dump_stack test exit\n");
++}
++
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my dump_stack code");
++
++module_init(dump_stack_test_init);
++module_exit(dump_stack_test_exit);
+-- 
+2.47.3
+
