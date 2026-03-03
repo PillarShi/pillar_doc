@@ -1,0 +1,100 @@
+From 1cb5706aed9a54ab0d518519169a673a9fe5c390 Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Tue, 3 Mar 2026 11:09:25 +0800
+Subject: [PATCH] 10-kthread
+
+---
+ kthread_test/Makefile       | 13 ++++++++
+ kthread_test/kthread_test.c | 60 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+)
+ create mode 100644 kthread_test/Makefile
+ create mode 100644 kthread_test/kthread_test.c
+
+diff --git a/kthread_test/Makefile b/kthread_test/Makefile
+new file mode 100644
+index 000000000..b82954419
+--- /dev/null
++++ b/kthread_test/Makefile
+@@ -0,0 +1,13 @@
++CROSS_ARCH := riscv
++CROSS_PREFIX := ~/project/PDC/riscv64-wangzai-linux-gnu-gcc/bin/riscv64-unknown-linux-gnu-
++CUR_DIR := $(shell pwd)
++KERNEL_DIR := ~/project/PDC/linux-5.4
++
++obj-m := kthread_test.o
++
++.PHONY: all clean
++all:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) modules
++
++clean:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) clean
+diff --git a/kthread_test/kthread_test.c b/kthread_test/kthread_test.c
+new file mode 100644
+index 000000000..5e18aa6b8
+--- /dev/null
++++ b/kthread_test/kthread_test.c
+@@ -0,0 +1,60 @@
++// SPDX-License-Identifier: GPL-2.0
++/**
++ * My code for linux kthread.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++#include <linux/kernel.h>
++#include <linux/types.h>
++#include <linux/module.h>
++#include <linux/kthread.h>
++#include <linux/delay.h>
++
++static int thread_entry(void *data)
++{
++	int *val = data;
++
++	while (!kthread_should_stop()) {
++		pr_info("data is int = %d\n", *val);
++		if (kthread_should_park()) {
++			pr_info("thread %s park\n", current->comm);
++			kthread_parkme();
++			pr_info("thread %s unpark\n", current->comm);
++		}
++		msleep(500);
++	}
++	return 0;
++}
++
++static int __init kthread_test_init(void)
++{
++	struct task_struct *thread;
++	int data = 34;
++
++	thread = kthread_run(thread_entry, &data, "thread%d", data);
++
++	msleep(500);
++	kthread_park(thread);
++
++	msleep(500);
++	kthread_unpark(thread);
++
++	msleep(1000);
++	kthread_stop(thread);
++
++	return 0;
++}
++
++static void __exit kthread_test_exit(void)
++{
++	pr_info("kthread test exit\n");
++}
++
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my kthread code");
++
++module_init(kthread_test_init);
++module_exit(kthread_test_exit);
+-- 
+2.47.3
+
