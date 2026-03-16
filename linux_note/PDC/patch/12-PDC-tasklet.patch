@@ -1,0 +1,93 @@
+From 46b07b325f0ce8cab4ea7cd5ee8868630a7ad7eb Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Sun, 15 Mar 2026 00:13:10 +0800
+Subject: [PATCH] 12-tasklet
+
+---
+ tasklet_test/Makefile       | 12 +++++++++
+ tasklet_test/tasklet_test.c | 54 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 66 insertions(+)
+ create mode 100644 tasklet_test/Makefile
+ create mode 100644 tasklet_test/tasklet_test.c
+
+diff --git a/tasklet_test/Makefile b/tasklet_test/Makefile
+new file mode 100644
+index 000000000..134e25160
+--- /dev/null
++++ b/tasklet_test/Makefile
+@@ -0,0 +1,12 @@
++CROSS_ARCH := riscv
++CROSS_PREFIX := ~/project/PDC/riscv64-wangzai-linux-gnu-gcc/bin/riscv64-unknown-linux-gnu-
++KERNEL_DIR := ~/project/PDC/linux-5.4
++CUR_DIR := $(shell pwd)
++
++obj-m := tasklet_test.o
++
++.PHONY: all clean
++all:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) modules
++clean:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) clean
+diff --git a/tasklet_test/tasklet_test.c b/tasklet_test/tasklet_test.c
+new file mode 100644
+index 000000000..d4405226e
+--- /dev/null
++++ b/tasklet_test/tasklet_test.c
+@@ -0,0 +1,54 @@
++// SPDX-License-Identifier: GPL-2.0
++/**
++ * My code for linux tasklet.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++#include <linux/types.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/interrupt.h>
++
++struct tasklet_struct test_tasklet;
++
++static void test_tasklet_handler(unsigned long data)
++{
++	pr_info("%s running, data = %ld\n", __func__, data);
++}
++
++static int __init tasklet_test_init(void)
++{
++	unsigned long data = 12;
++
++	/* 初始化 */
++	tasklet_init(&test_tasklet, test_tasklet_handler, data);
++
++	/* 使能 */
++	tasklet_enable(&test_tasklet);
++
++	/* 开始调度 */
++	tasklet_schedule(&test_tasklet);
++
++	/* 失能 -- 暂时去掉 */
++	tasklet_disable(&test_tasklet);
++
++	tasklet_schedule(&test_tasklet);
++
++	return 0;
++}
++
++static void __exit tasklet_test_exit(void)
++{
++	/* 杀死 -- 完全去掉 */
++	tasklet_kill(&test_tasklet);
++	pr_info("tasklet test exit\n");
++}
++
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my tasklet code");
++
++module_init(tasklet_test_init);
++module_exit(tasklet_test_exit);
+-- 
+2.47.3
+

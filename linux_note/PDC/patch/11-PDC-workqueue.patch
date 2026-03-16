@@ -1,0 +1,117 @@
+From ce745a887b96ecb6d5738416adbdddd95e768624 Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Tue, 10 Mar 2026 15:39:01 +0800
+Subject: [PATCH] 11-workqueue
+
+---
+ workqueue_test/Makefile         | 12 +++++
+ workqueue_test/workqueue_test.c | 78 +++++++++++++++++++++++++++++++++
+ 2 files changed, 90 insertions(+)
+ create mode 100644 workqueue_test/Makefile
+ create mode 100644 workqueue_test/workqueue_test.c
+
+diff --git a/workqueue_test/Makefile b/workqueue_test/Makefile
+new file mode 100644
+index 000000000..47ef72c6a
+--- /dev/null
++++ b/workqueue_test/Makefile
+@@ -0,0 +1,12 @@
++CROSS_ARCH := riscv
++CROSS_PREFIX := ~/project/PDC/riscv64-wangzai-linux-gnu-gcc/bin/riscv64-unknown-linux-gnu-
++KERNEL_DIR := ~/project/PDC/linux-5.4
++CUR_DIR := $(shell pwd)
++
++obj-m := workqueue_test.o
++
++.PHONY: all clean
++all:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) modules
++clean:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) clean
+diff --git a/workqueue_test/workqueue_test.c b/workqueue_test/workqueue_test.c
+new file mode 100644
+index 000000000..0d06c311e
+--- /dev/null
++++ b/workqueue_test/workqueue_test.c
+@@ -0,0 +1,78 @@
++// SPDX-License-Identifier: GPL-2.0
++/**
++ * My code for linux workqueue.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++#include <linux/kernel.h>
++#include <linux/types.h>
++#include <linux/module.h>
++#include <linux/workqueue.h>
++#include <linux/delay.h>
++
++static struct workqueue_struct *wq;
++static struct work_struct job1;
++static struct work_struct job2;
++static struct work_struct job3;
++static struct delayed_work job4; /* delay work */
++
++static void job1_func(struct work_struct *work)
++{
++	pr_info("job1\n");
++	mdelay(1000);
++}
++
++static void job2_func(struct work_struct *work)
++{
++	flush_work(&job1); /* wait for job1 to complete */
++	pr_info("job2\n");
++}
++
++static void job3_func(struct work_struct *work)
++{
++	pr_info("job3\n");
++}
++
++static void job4_func(struct work_struct *work)
++{
++	pr_info("job4\n");
++}
++
++static int __init workqueue_test_init(void)
++{
++	wq = create_workqueue("my_test_wq"); /* precpu single thread work queue */
++
++	INIT_WORK(&job1, job1_func);
++	INIT_WORK(&job2, job2_func);
++	INIT_WORK(&job3, job3_func);
++	INIT_DELAYED_WORK(&job4, job4_func);
++
++	queue_work(wq, &job1);
++	queue_work(wq, &job2);
++	msleep(500);
++	pr_info("job1 and job2 500ms\n");
++
++	flush_workqueue(wq); /* wait for wq to complete */
++	queue_work(wq, &job3);
++
++	queue_delayed_work(wq, &job4, msecs_to_jiffies(1000)); /* 1000ms */
++	msleep(500);
++	pr_info("job4 500ms\n");
++
++	return 0;
++}
++
++static void __exit workqueue_test_exit(void)
++{
++	destroy_workqueue(wq);
++	pr_info("workqueue test exit\n");
++}
++
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my workqueue code");
++
++module_init(workqueue_test_init);
++module_exit(workqueue_test_exit);
+-- 
+2.47.3
+
