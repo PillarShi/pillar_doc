@@ -1,0 +1,115 @@
+From 6dfb8e3b25fc16176ea8a0897ad8b5c03b2901c9 Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Wed, 1 Apr 2026 13:09:58 +0800
+Subject: [PATCH] 15-notifier
+
+---
+ notifier_test/Makefile        | 12 ++++++
+ notifier_test/notifier_test.c | 76 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 88 insertions(+)
+ create mode 100644 notifier_test/Makefile
+ create mode 100644 notifier_test/notifier_test.c
+
+diff --git a/notifier_test/Makefile b/notifier_test/Makefile
+new file mode 100644
+index 000000000..b85310c1a
+--- /dev/null
++++ b/notifier_test/Makefile
+@@ -0,0 +1,12 @@
++CROSS_ARCH := riscv
++CROSS_PREFIX := ~/project/PDC/riscv64-wangzai-linux-gnu-gcc/bin/riscv64-unknown-linux-gnu-
++CUR_DIR := $(shell pwd)
++KERNEL_DIR := ~/project/PDC/linux-5.4
++
++obj-m := notifier_test.o
++
++.PHONY: all clean
++all:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) modules
++clean:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) clean
+diff --git a/notifier_test/notifier_test.c b/notifier_test/notifier_test.c
+new file mode 100644
+index 000000000..bacca7ea2
+--- /dev/null
++++ b/notifier_test/notifier_test.c
+@@ -0,0 +1,76 @@
++// SPDX-License-Identifier: GPL-2.0
++/**
++ * My code for linux notifier.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++#include <linux/kernel.h>
++#include <linux/types.h>
++#include <linux/module.h>
++#include <linux/notifier.h>
++
++#define NB_ACTION_A	1
++#define NB_ACTION_B	2
++
++#define TEST_NB_CB(n)								\
++static int test_nb_##n(struct notifier_block *nb,				\
++	unsigned long action, void *data)					\
++{										\
++	if (action == NB_ACTION_A) {						\
++		pr_info("%s NB_ACTION_A data : %d\n", __func__, *(int *)data);	\
++	} else if (action == NB_ACTION_B) {					\
++		pr_info("%s NB_ACTION_B data : %d\n", __func__, *(int *)data);	\
++	} else {								\
++		pr_info("%s unknow action\n", __func__);			\
++	}									\
++	return 0;								\
++}
++
++TEST_NB_CB(1);
++TEST_NB_CB(2);
++
++static BLOCKING_NOTIFIER_HEAD(test_notifier_head);
++
++static struct notifier_block test_notifier_block1 = {
++	.notifier_call = test_nb_1,
++	.priority = INT_MIN + 1
++};
++
++static struct notifier_block test_notifier_block2 = {
++	.notifier_call = test_nb_2,
++	.priority = INT_MIN + 2
++};
++
++static int __init notifier_test_init(void)
++{
++	int data = 0;
++
++	blocking_notifier_chain_register(&test_notifier_head, &test_notifier_block1);
++	blocking_notifier_chain_register(&test_notifier_head, &test_notifier_block2);
++
++	data = 3;
++	pr_info("NB_ACTION_A send and data = %d\n", data);
++	blocking_notifier_call_chain(&test_notifier_head, NB_ACTION_A, &data);
++
++	data = 4;
++	pr_info("NB_ACTION_B send and data = %d\n", data);
++	blocking_notifier_call_chain(&test_notifier_head, NB_ACTION_B, &data);
++
++	return 0;
++}
++
++static void __exit notifier_test_exit(void)
++{
++	blocking_notifier_chain_unregister(&test_notifier_head, &test_notifier_block1);
++	blocking_notifier_chain_unregister(&test_notifier_head, &test_notifier_block2);
++	pr_info("notifier test exit\n");
++}
++
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my notifier code");
++
++module_init(notifier_test_init);
++module_exit(notifier_test_exit);
+-- 
+2.47.3
+

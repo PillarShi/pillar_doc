@@ -1,0 +1,89 @@
+From a21984a69969ae068b03b576f2877f2d54801bbf Mon Sep 17 00:00:00 2001
+From: pillar <pillar.shi@outlook.com>
+Date: Thu, 9 Apr 2026 10:47:49 +0800
+Subject: [PATCH] 16-timer
+
+---
+ timer_test/Makefile     | 12 ++++++++++
+ timer_test/timer_test.c | 50 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 62 insertions(+)
+ create mode 100644 timer_test/Makefile
+ create mode 100644 timer_test/timer_test.c
+
+diff --git a/timer_test/Makefile b/timer_test/Makefile
+new file mode 100644
+index 000000000..2354d377b
+--- /dev/null
++++ b/timer_test/Makefile
+@@ -0,0 +1,12 @@
++CROSS_ARCH := riscv
++CROSS_PREFIX := ~/project/PDC/riscv64-wangzai-linux-gnu-gcc/bin/riscv64-unknown-linux-gnu-
++CUR_DIR := $(shell pwd)
++KERNEL_DIR := ~/project/PDC/linux-5.4
++
++obj-m := timer_test.o
++
++.PHONY: all clean
++all:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) modules
++clean:
++	make ARCH=$(CROSS_ARCH) CROSS_COMPILE=$(CROSS_PREFIX) M=$(CUR_DIR) -C $(KERNEL_DIR) clean
+diff --git a/timer_test/timer_test.c b/timer_test/timer_test.c
+new file mode 100644
+index 000000000..0f3dec0a2
+--- /dev/null
++++ b/timer_test/timer_test.c
+@@ -0,0 +1,50 @@
++// SPDX-License-Identifier: GPL-2.0
++/**
++ * My code for linux timer.
++ *
++ * Copyright (C) 2026 Pillar
++ *
++ * This module serves no practical purpose and is solely for testing purposes.
++ */
++#include <linux/kernel.h>
++#include <linux/types.h>
++#include <linux/module.h>
++#include <linux/timer.h>
++
++static struct timer_list timer0;
++static struct timer_list timer1;
++
++static void timer_cb(struct timer_list *timer_p)
++{
++	if (timer_p == &timer0)
++		pr_info("timer0\n");
++	else if (timer_p == &timer1) {
++		pr_info("timer1\n");
++		mod_timer(timer_p, jiffies + msecs_to_jiffies(1000));
++	} else
++		pr_info("timer unknow\n");
++}
++
++static int __init timer_test_init(void)
++{
++	timer_setup(&timer0, timer_cb, 0);
++	timer_setup(&timer1, timer_cb, 0);
++	mod_timer(&timer0, jiffies + msecs_to_jiffies(1000));
++	mod_timer(&timer1, jiffies + msecs_to_jiffies(1000));
++
++	return 0;
++}
++
++static void __exit timer_test_exit(void)
++{
++	del_timer(&timer1);
++	pr_info("timer1 delete\n");
++	pr_info("timer test exit\n");
++}
++
++MODULE_AUTHOR("Pillar Shi");
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("This is my timer code");
++
++module_init(timer_test_init);
++module_exit(timer_test_exit);
+-- 
+2.47.3
+
