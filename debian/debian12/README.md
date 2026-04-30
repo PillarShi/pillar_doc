@@ -1,4 +1,4 @@
-# debian12+xfce
+# debian12+xfce 安装及设置
 
 ## 1 修复环境变量
 
@@ -229,3 +229,17 @@ sudo apt --fix-broken install
 ### 安装vscode
 
 浏览器下载安装
+
+### SSH
+
+```bash
+sudo apt remove openssh-server # 下载
+```
+
+在主机目录`C:\Users\自己的用户名\.ssh\config`下添加例如
+```
+Host debian
+  HostName 192.168.1.2
+  User pillar
+  Port 22
+```

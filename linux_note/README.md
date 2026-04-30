@@ -6,7 +6,7 @@
 
 ## PDC学到的
 
-[相关文档](./PDC/ReadMe.md)
+[相关文档](./PDC/README.md)
 
 ## 源码阅读
 
