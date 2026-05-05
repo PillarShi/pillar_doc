@@ -9,4 +9,5 @@
 - [NAS](./NAS/README.md)
 - [RTOS](./RTOS/README.md)
 - [UBOOT](./uboot_notes/README.md)
+- [Vim](./vim/README.md)
 - [vscode 系列配置](./vscode_vscodium/README.md)
