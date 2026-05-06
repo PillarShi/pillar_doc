@@ -51,6 +51,17 @@ set statusline=%#StatusLineTerm#\ %<%.20f%m%r\ %#StatusLineNC#\ [%{&ff}]\ [%Y]\ 
 
 " 设置光标样式
 set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
+" linux下部分终端需要
+" 进入 Vim 时：普通模式用方块
+let &t_ti .= "\e[1 q"
+" 进入插入模式时：竖线闪烁光标
+let &t_SI .= "\e[5 q"
+" 进入替换模式：下划线
+let &t_SR.="\e[3 q"
+" 退出插入模式返回普通模式：方块
+let &t_EI .= "\e[1 q"
+" 离开 Vim 时恢复默认
+let &t_te .= "\e[0 q"
 
 " 启用鼠标支持 - 可以用鼠标选择、滚动等
 set mouse=a

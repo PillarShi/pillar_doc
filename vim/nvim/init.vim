@@ -74,4 +74,3 @@ if has('win32')
 	" 终端设置
 	set shell=powershell.exe
 endif
-
