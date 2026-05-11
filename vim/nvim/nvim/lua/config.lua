@@ -10,7 +10,7 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
 -------------------------------------------------------------------------------
--- 行号与光标
+-- 行列号与光标
 -------------------------------------------------------------------------------
 
 -- 显示行号
@@ -20,22 +20,33 @@ vim.opt.number = true
 -- 显示光标当前位置
 vim.opt.ruler = true
 -- 光标行高亮
--- vim.opt.cursorline = true
+vim.opt.cursorline = true
 -- 设置光标样式
 vim.opt.guicursor = "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50"
+-- 设置ruler
+vim.opt.colorcolumn = "80,120"
 
 -------------------------------------------------------------------------------
 -- 制表符与缩进
 -------------------------------------------------------------------------------
 
 -- 制表符显示的宽度
-vim.opt.tabstop = 8
--- 使用 >> 或 << 进行缩进/反缩进时，移动 8 个空格
-vim.opt.shiftwidth = 8
+vim.opt.tabstop = 4
+-- 使用 >> 或 << 进行缩进/反缩进时，移动 n 个空格
+vim.opt.shiftwidth = 4
+vim.opt_local.softtabstop = 4
 -- 将制表符转换为空格 (默认注释，需要时取消注释)
--- vim.opt.expandtab = true
+vim.opt.expandtab = true
 -- 自动缩进
 vim.opt.autoindent = true
+-- 开启特殊字符的可视化显示
+vim.opt.list = true
+-- 显式配置
+vim.opt.listchars = {
+  space = "·"   ,
+  tab   = "→ "  ,
+  trail = "·"   ,
+}
 
 -------------------------------------------------------------------------------
 -- 分割方向
@@ -52,6 +63,7 @@ vim.opt.splitright = true
 -- 状态行
 -------------------------------------------------------------------------------
 
+-- 使用 lualine.nvim 插件替代
 -- 显示当前模式 (Neovim 默认已显示，但显式开启无妨)
 vim.opt.showmode = true
 -- 显示输入的命令
@@ -78,6 +90,17 @@ vim.opt.backspace = "indent,eol,start"
 -- 其他
 -------------------------------------------------------------------------------
 
+-- 文件结尾换行符检查
+vim.opt.eol = true
+-- 文件结尾换行符自动添加
+vim.opt.fixeol = true
+
+-- 启用激进的自动保存
+--vim.o.autowriteall = true
+
+-- 在文件外部修改时自动加载
+vim.opt.autoread = true
+
 -- 取消备份文件
 vim.opt.backup = false
 vim.opt.writebackup = false
@@ -98,4 +121,3 @@ vim.opt.belloff = "all"
 if vim.fn.has("win32") == 1 then
   vim.opt.shell = "powershell.exe"
 end
-
