@@ -21,3 +21,21 @@ Linux 放在 `~/.config/nvim` 目录下。
 对比下来，虽然两者都配置复杂，但总体 nvim 确实比较省心些，现代化些（只是lua比较讨厌吧，基础配置下lua也不用怎么搞，还能接受）
 
 可以将 `./nvim/nvim` 放置之前放 `init.vim` 的位置。（`init.vim`需要去除）
+
+拷贝/软连接
+
+### 安装依赖
+
+下载字体
+
+npm -- pyright lsp -- 暂弃
+
+安装 Rust 工具链（失败安装重试`rustup default stable`） -- asm lsp -- 暂弃
+
+---
+
+相关参考：
+
+- https://kznleaf.top/2026/04/25/From-lazy-to-vimpack/#nvim-treesitter
+- https://martinlwx.github.io/zh-cn/config-neovim-from-scratch/#%E6%80%BB%E7%BB%93
+- https://www.bilibili.com/video/BV1N6ZRY7Etj/?p=15&share_source=copy_web&vd_source=5fa7b3693d8da11802d9a9ea8897259d
