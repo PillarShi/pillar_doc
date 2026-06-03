@@ -97,3 +97,10 @@ require("plugin.markview")
 -- require("plugin.markdown-plus")
 -- mkdnflow.nvim
 require("plugin.mkdnflow")
+
+-------------------------------------------------------------------------------
+-- nvim-treesitter
+-------------------------------------------------------------------------------
+-- if vim.version().major == 0 and vim.version().minor == 12 then
+--   require("plugin.nvim-treesitter")
+-- end
