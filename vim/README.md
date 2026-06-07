@@ -27,13 +27,14 @@ Linux 放在 `~/.config/nvim` 目录下。
 ### 安装依赖
 
 1. 下载字体
-2. nvim-treesitter -- 暂弃：
+2. curl(linux中可以设置`export https_proxy=http://127.0.0.1:7890 && export http_proxy=http://127.0.0.1:7890`采用vpn) + python + venv(`apt install python3.13-venv`) + zip + unzip
+3. nvim-treesitter -- 暂弃：
    - C编译器
      - windows：安装[Microsoft C++ 生成工具](https://visualstudio.microsoft.com/zh-hans/visual-cpp-build-tools/)，勾选"使用C++的桌面开发"工作负载，确保安装"Windows SDK"组件
    - 安装[tree-sitter-cli](https://github.com/tree-sitter/tree-sitter/releases)
-3. pyright lsp -- 暂弃：
+4. pyright lsp -- 暂弃：
    npm
-4. asm lsp -- 暂弃：
+5. asm lsp -- 暂弃：
    安装 Rust 工具链（失败安装重试`rustup default stable`
 
 ---
