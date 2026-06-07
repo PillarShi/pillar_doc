@@ -58,6 +58,10 @@ require("plugin.lualine")
 -- 顶部buffer
 require("plugin.bufferline")
 
+-- dropbar.nvim
+-- windbar
+require("plugin.dropbar")
+
 -------------------------------------------------------------------------------
 -- 编辑
 -------------------------------------------------------------------------------
@@ -104,3 +108,5 @@ require("plugin.mkdnflow")
 -- if vim.version().major == 0 and vim.version().minor == 12 then
 --   require("plugin.nvim-treesitter")
 -- end
+
+

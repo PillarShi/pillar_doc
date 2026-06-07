@@ -43,3 +43,4 @@ Linux 放在 `~/.config/nvim` 目录下。
 - https://kznleaf.top/2026/04/25/From-lazy-to-vimpack/#nvim-treesitter
 - https://martinlwx.github.io/zh-cn/config-neovim-from-scratch/#%E6%80%BB%E7%BB%93
 - https://www.bilibili.com/video/BV1N6ZRY7Etj/?p=15&share_source=copy_web&vd_source=5fa7b3693d8da11802d9a9ea8897259d
+- https://github.com/LintaoAmons/CoolStuffes  未研究完，持续参考(相关视频 https://www.bilibili.com/video/BV17V411972b/?spm_id_from=333.1007.top_right_bar_window_history.content.click&vd_source=82d420cf36e701deefb4917855e629b4)
