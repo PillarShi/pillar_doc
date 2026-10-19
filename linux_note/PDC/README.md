@@ -15,7 +15,7 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
 
 在链表操作中，通常：
 
-- next 指针：是遍历链表的入口点，可能被并发访问
+- next 指针：是遍历链表的入口点，可能被并发访问（如判断链表是否为空，是不加锁的），因此需要确保编译器不进行优化重排。
 - prev 指针：通常只在持有锁的情况下访问，并发风险较低
 
 #### list delete node
