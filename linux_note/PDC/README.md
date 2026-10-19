@@ -40,10 +40,10 @@ https://zhuanlan.zhihu.com/p/8068425906
 
 #### spinlock
 
-阅读源码时发现 `spin_lock_irqsave` 是宏展开，`spin_unlock_irqrestore` 却是静态内联函数，我认为：
+阅读源码时发现 `spin_lock_irqsave` 是宏展开，`spin_unlock_irqrestore` 却是静态内联函数：
 
-- `spin_lock_irqsave` 函数参数中的`flag`是获取。若是函数，在完全按语义下则需要多一次栈空间，传入指针；而宏展开则可以直接赋值flag到当前变量。
-- `spin_unlock_irqrestore` 函数参数中的`flag`是单纯传入数据。这时没上面问题，用静态内联函数让编译器去动态判断，动态平衡性能与空间。
+- `spin_lock_irqsave(lock, flags)` 函数需要把当前 CPU 的中断状态写回调用者提供的变量。如果实现为普通函数，语义上就需要传入 `unsigned long *flags`，调用者额外提供栈变量，函数内再通过指针间接写入，多一层间接寻址。宏展开则让 flags 直接绑定到调用者的变量上，赋值直接，无指针间接层，同时强制调用者在自己栈上提供私有的 flags 变量，避免共享存储的并发风险。
+- `static __always_inline void spin_unlock_irqrestore(spinlock_t *lock, unsigned long flags)` 读取该值恢复中断状态，不需要写回，完全可以实现为静态内联函数。它强制内联，消除函数调用开销，同时保留参数类型检查，对 sparse 等静态分析工具的锁上下文追踪也更友好。
 
 ### workqueue
 
