@@ -67,6 +67,8 @@ https://zhuanlan.zhihu.com/p/8068425906
   - work 是某个 teardown/cleanup 的必要步骤，而这个 cleanup 会在 reclaim 压力下被等待
   - 某个代码路径在内存分配失败或低内存情况下，仍然要依赖该 work 完成才能继续
 
+和 kthread 的区别：Workqueue 是内核的异步延迟执行机制，你把任务封装成 work 排入队列，由内核管理的 worker 线程池择机执行，把耗时或可能阻塞的操作移出关键路径；work 跑在进程上下文、可以睡眠，worker 睡眠时内核会调度其他 worker 接手，但长睡仍占用 worker 槽位，延迟执行应优先用 delayed_work。它与 kthread 的本质区别是把线程管理交给内核：worker 池按需伸缩、复用回收，多个 work 共享 worker，无需自己写退出逻辑、无需为小任务养常驻线程；kthread 则是你亲手创建的专属常驻线程，逻辑独享，可自由长循环、长睡眠、写复杂状态机，但生命周期和退出同步得自己管。选型：任务短小、可延迟、不想管线程，用 Workqueue；任务常驻、要长循环长睡眠、需独立状态机，才自己建 kthread。
+
 ### wait queue
 
 https://zhuanlan.zhihu.com/p/474516220
